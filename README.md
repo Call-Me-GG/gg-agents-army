@@ -63,7 +63,7 @@ Before you begin, make sure you have the following software installed:
 
 Clone the repository and navigate to the project directory:
 ```bash
-git clone https://github.com/coleam00/local-ai-packaged.git
+git clone https://github.com/Call-Me-GG/gg-agents-army.git
 cd local-ai-packaged
 ```
 
