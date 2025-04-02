@@ -3,9 +3,9 @@ volumes:
   ollama_storage:
   qdrant_storage:
   open-webui:
-  flowise:
-  caddy-data:
-  caddy-config:
+  flowise:             # Volume per Flowise, che può essere rimosso se non usato
+  caddy-data:          # Volume per Caddy, che può essere rimosso se non usato
+  caddy-config:        # Volume per la configurazione di Caddy, che può essere rimosso se non usato
   valkey-data:  
 
 x-n8n: &service-n8n
@@ -21,6 +21,7 @@ x-n8n: &service-n8n
     - N8N_ENCRYPTION_KEY
     - N8N_USER_MANAGEMENT_JWT_SECRET
 
+# Ollama - Questo servizio è dedicato all'uso di Ollama (AI inference), può essere disabilitato se non necessario
 x-ollama: &service-ollama
   image: ollama/ollama:latest
   container_name: ollama
@@ -30,6 +31,7 @@ x-ollama: &service-ollama
   volumes:
     - ollama_storage:/root/.ollama
 
+# Servizio che inizializza Ollama, per scaricare i modelli
 x-init-ollama: &init-ollama
   image: ollama/ollama:latest
   container_name: ollama-pull-llama
@@ -39,13 +41,9 @@ x-init-ollama: &init-ollama
   command:
     - "-c"
     - "sleep 3; OLLAMA_HOST=ollama:11434 ollama pull qwen2.5:7b-instruct-q4_K_M; OLLAMA_HOST=ollama:11434 ollama pull nomic-embed-text"
-    # For a larger context length verison of the model, run these commands:
-    # echo "FROM qwen2.5:7b-instruct-q4_K_M\n\nPARAMETER num_ctx 8096" > Modelfile
-    # ollama create qwen2.5:7b-8k -f ./Modelfile
-    # Change the name of the LLM and num_ctx as you see fit.
 
 services:
-  flowise:
+  flowise: # Rimuovere questo servizio se non lo utilizzi
     image: flowiseai/flowise
     restart: unless-stopped
     container_name: flowise
@@ -54,7 +52,7 @@ services:
     ports:
         - 3001:3001
     extra_hosts:
-      - "host.docker.internal:host-gateway"        
+      - "host.docker.internal:host-gateway"
     volumes:
         - ~/.flowise:/root/.flowise
     entrypoint: /bin/sh -c "sleep 3; flowise start"
@@ -103,7 +101,7 @@ services:
     volumes:
       - qdrant_storage:/qdrant/storage
 
-  caddy:
+  caddy:  # Rimuovere se non utilizzi il reverse proxy
     container_name: caddy
     image: docker.io/library/caddy:2-alpine
     network_mode: host
@@ -173,6 +171,7 @@ services:
         max-size: "1m"
         max-file: "1"      
 
+  # Rimuovi i seguenti servizi se non utilizzi Ollama
   ollama-cpu:
     profiles: ["cpu"]
     <<: *service-ollama
