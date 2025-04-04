@@ -3,7 +3,7 @@
 start_services.py
 
 This script starts the Supabase stack first, waits for it to initialize, and then starts
-the local AI stack. Both stacks use the same Docker Compose project name ("localai")
+the local AI stack. Both stacks use the same Docker Compose project name ("gg-agents-army")
 so they appear together in Docker Desktop.
 """
 
@@ -47,11 +47,11 @@ def prepare_supabase_env():
     shutil.copyfile(env_example_path, env_path)
 
 def stop_existing_containers():
-    """Stop and remove existing containers for our unified project ('localai')."""
-    print("Stopping and removing existing containers for the unified project 'localai'...")
+    """Stop and remove existing containers for our unified project ('gg-agents-army')."""
+    print("Stopping and removing existing containers for the unified project 'gg-agents-army'...")
     run_command([
         "docker", "compose",
-        "-p", "localai",
+        "-p", "gg-agents-army",
         "-f", "docker-compose.yml",
         "-f", "supabase/docker/docker-compose.yml",
         "down"
@@ -61,13 +61,13 @@ def start_supabase():
     """Start the Supabase services (using its compose file)."""
     print("Starting Supabase services...")
     run_command([
-        "docker", "compose", "-p", "localai", "-f", "supabase/docker/docker-compose.yml", "up", "-d"
+        "docker", "compose", "-p", "gg-agents-army", "-f", "supabase/docker/docker-compose.yml", "up", "-d"
     ])
 
 def start_local_ai(profile=None):
     """Start the local AI services (using its compose file)."""
     print("Starting local AI services...")
-    cmd = ["docker", "compose", "-p", "localai"]
+    cmd = ["docker", "compose", "-p", "gg-agents-army"]
     if profile and profile != "none":
         cmd.extend(["--profile", profile])
     cmd.extend(["-f", "docker-compose.yml", "up", "-d"])
